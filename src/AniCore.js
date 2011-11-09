@@ -56,7 +56,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
         } else {
             var f = false, t = false;
 
-            if (this.fieldName in this.targetObject){
+            if ((this.fieldName && this.targetObject)&&(this.fieldName in this.targetObject)){
                 f = true;
                 var n = this.targetObject[this.fieldName];
                 t = !isNaN(n);
