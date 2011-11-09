@@ -1,3 +1,5 @@
+var Ani = Ani || {};
+
 Ani.AniSequence = function(){
     this.steps = [];
     this.addParallelAnisCollector = [];

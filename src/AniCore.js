@@ -1,3 +1,5 @@
+var Ani = Ani || {};
+
 Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, targetObjectFieldName, end, easing, timeMode, callback){
 
     this.targetName = targetObject ? targetObject.toString() : "";

@@ -1,3 +1,5 @@
+var Ani = Ani || {};
+
 Ani.Easings = Ani.Easings || {};
 
 /**
@@ -9,10 +11,10 @@ Ani.Easings.Easing = function(easingMode){
 
 Ani.Easings.Easing.prototype = {
     constructor: Ani.Easings.Easing,
-    
+
     /**
-     * Calc easing: map time to position. 
-     * 
+     * Calc easing: map time to position.
+     *
 	 * @param t the time
 	 * @param b the begin
 	 * @param c the change
@@ -22,7 +24,7 @@ Ani.Easings.Easing.prototype = {
     calcEasing: function(f, b, c, d){
         var out = 0.0,
             mode = Ani.Constants;
-        
+
         switch(easingMode){
             case mode.IN:
                 out = easeIn(t, b, c, d);
@@ -39,7 +41,7 @@ Ani.Easings.Easing.prototype = {
         }
         return out;
     },
-    
+
     /**
 	 * Set the shape mode
 	 * @param theEasingMode IN, OUT, IN_OUT
@@ -47,7 +49,7 @@ Ani.Easings.Easing.prototype = {
     setMode: function(easingMode){
         this.easingMode = easingMode;
     },
-    
+
     /**
 	 * All extensions of the Easing class should implement the following methods
 	 */
