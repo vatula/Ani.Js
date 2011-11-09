@@ -2,13 +2,12 @@ var Ani = Ani || {};
 
 Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, targetObjectFieldName, end, easing, timeMode, callback){
 
-    this.targetName = targetObject ? targetObject.toString() : "";
+    this.targetName = targetObject ? Ani.Util.fnv1aHash(targetObject.constructor.toString()).toString() : "";
     this.fieldName = targetObjectFieldName || "";
     this.id = this.targetName+"_"+this.fieldName;
 
     this.isRegistered = false;
     this.targetObject = targetObject || null;
-    this.targetField = "";
 
     this.position = 0.0;
     this.begin = 0.0;
@@ -43,7 +42,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     this.isEnded = false;
 
     /**
-	 * Sets the begin of the animation to the current value of the target.
+     * Sets the begin of the animation to the current value of the target.
      * or Sets the begin of the animation to a new value if value provided
 	 *
 	 * @return true, if successful
@@ -78,7 +77,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
                 red = /\s*:\s*/;
             var propertyList = callback.split(rec);
             for(var prop in propertyList){
-                var p = prop.split(red);
+                var p = propertyList[prop].split(red);
                 if (p.length === 2){
                     if (p[0] === Ani.Constants.ON_START || p[0] === Ani.Constants.ON_END){
                         var targetMethod = p[1];
@@ -102,7 +101,9 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     };
 
     var dispatchOnEnd = function(){
-        this.targetObject[this.callbackFinishMethod]();
+        if (this.callbackFinishMethod){
+            this.targetObject[this.callbackFinishMethod]();
+        }
     };
 
     /**
@@ -110,7 +111,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 	 */
     this.pre = function(){
         if (this.isPlaying){
-            update();
+            update.call(this);
         }
     };
 
@@ -119,28 +120,30 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 	 */
     this.start = function(){
         if (!this.isRegistered){
+            Ani.register(this);
             this.repeatNumber = 1;
             this.isRegistered = true;
-            dispatchOnStart();
+            dispatchOnStart.call(this);
         }
         this.seek(0.0);
         this.isPlaying = true;
         this.isEnded = false;
     };
 
-    this.end = function(){
+    var end = function(){
         this.isDelaying = false;
         this.seek(1.0);
         this.isPlaying = false;
         this.isEnded = true;
         if (this.isRegistered){
+            Ani.unregister(this);
             this.isRegistered = false;
         }
-        dispatchOnEnd();
+        dispatchOnEnd.call(this);
     };
 
     var update = function(){
-        setTime(getTime());
+        setTime.call(this, getTime.call(this));
 
         // delay or easing?
         if (this.time < this.durationDelay){
@@ -160,13 +163,13 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
                         this.isRepeating = false;
                     }
                 } else {
-                    end();
+                    end.call(this);
                 }
             } else {
-                updatePosition();
+                updatePosition.call(this);
             }
         }
-        updateTargetObjectField();
+        updateTargetObjectField.call(this);
     };
 
     var updatePosition = function(){
@@ -174,18 +177,18 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     };
 
     var updateTargetObjectField = function(){
-        this.targetObject[this.targetField] = this.position;
+        this.targetObject[this.fieldName] = this.position;
     };
 
-    var date = new Date();
-
     var getTime = function(){
+        var date = new Date();
         return (this.timeMode === Ani.Constants.SECONDS) ?
             ((date.getTime() - this.beginTime) / 1000) :
             ((date.getTime() - this.beginTime) / 1000); // TODO: (papplet.frameCount - beginTime);
     };
 
     var setTime = function(theTime){
+        var date = new Date();
         this.time = theTime;
         this.beginTime = (this.timeMode === Ani.Constants.SECONDS) ?
             (date.getTime() - this.time*1000) :
@@ -197,7 +200,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 	 */
      this.pause = function(){
         this.isPlaying = false;
-        this.pauseTime = getTime();
+        this.pauseTime = getTime.call(this);
      };
 
     /**
@@ -205,6 +208,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 	 */
      this.resume = function(){
         if (!this.isRegistered){
+            Ani.register(this);
             this.isRegistered = true;
         }
         if (!this.isPlaying && !this.isEnded){
@@ -222,16 +226,16 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
      this.seek = function(theValue){
         // clamp between 0 and 1
         theValue = Math.min(1.0, Math.max(0.0, theValue));
-        setTime(theValue*this.durationTotal);
+        setTime.call(this, theValue*this.durationTotal);
         this.pauseTime = this.time; // overwrite old pause time
         this.isEnded = false;
         // only use easing function to calc position if time > durationDelay
         if (this.time < this.durationDelay){
             this.position = this.begin;
         } else {
-            updatePosition();
+            updatePosition.call(this);
         }
-        updateTargetObjectField();
+        updateTargetObjectField.call(this);
      };
 
      /**

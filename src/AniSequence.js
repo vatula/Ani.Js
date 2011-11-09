@@ -12,23 +12,23 @@ Ani.AniSequence = function(){
 
     /**
      * No need to call ever this method. Only public to use the registerPre() mechanism
-	 */
+     */
     this.pre = function(){
         if (this.isPlaying){
-            update();
+            update.call(this);
         }
     };
 
     var update = function(){
         if (this.steps.length > 0){
             var tmpStep = this.steps[this.currentStep];
-            if (tmpStep.isFinished && this.currentStep < this.steps.length-1){
+            if (tmpStep.isFinished() && this.currentStep < this.steps.length-1){
                 this.currentStep++;
                 var nextStep = this.steps[this.currentStep];
                 nextStep.start();
                 tmpStep = nextStep;
             } else if (this.currentStep === this.steps.length-1){
-                this.isEnded = tmpStep.isFinished;
+                this.isEnded = tmpStep.isFinished();
             }
 
             this.time = tmpStep.startTime + tmpStep.getTime();
@@ -72,22 +72,22 @@ Ani.AniSequence = function(){
     /**
      * Adds a single Ani to the sequence
 	 *
-	 * @param theAni
+	 * @param anis
 	 */
     this.add = function(anis){
         if (anis && (anis.constructor === Array)){
             if (!this.addParallel){
                 this.beginStep();
                 for(var a in anis){
-                    this.add(a);
+                    this.add(anis[a]);
                 }
                 this.endStep();
             } else { // beginParallel() was called before, so add insertParallelAnisCollector
                 for(var pa in anis){
-                    this.add(pa);
+                    this.add(anis[pa]);
                 }
             }
-        } else if (anis /*&& anis.constructor === Ani.AniCtor*/){
+        } else if (anis && anis.constructor === Ani.Ani){
             var ani = anis;
             if (this.addParallel){
                 this.addParallelAnisCollector.push(ani);
@@ -122,7 +122,7 @@ Ani.AniSequence = function(){
     this.start = function(){
         this.isPlaying = true;
         this.isEnded = false;
-        reconstruct();
+        reconstruct.call(this);
         // start the first step
         var step = this.steps[this.currentStep];
         step.start();
@@ -152,8 +152,8 @@ Ani.AniSequence = function(){
 	 */
     this.beginSequence = function(){
         // disable autostart feature of Ani
-        Ani.noAutostart();
-        Ani.noEverwrite();
+        Ani.Ani.noAutostart();
+        Ani.Ani.noOverwrite();
     };
 
     /**
@@ -161,9 +161,9 @@ Ani.AniSequence = function(){
 	 */
     this.endSequence = function(){
         // enable autostart feature of Ani
-        Ani.autostart();
-        Ani.overwrite();
-        reconstruct();
+        Ani.Ani.autostart();
+        Ani.Ani.overwrite();
+        reconstruct.call(this);
     };
 
     // reconstruct all variables back to their origin values (before the sequence was created)
@@ -173,7 +173,10 @@ Ani.AniSequence = function(){
         // calc global durationTotal of all steps
         // set start- and end times to the steps
         this.durationTotal = 0;
-        for(var step in this.steps){
+        var s, step;
+
+        for(s in this.steps){
+            step = this.steps[s];
             step.pause(); // just in case this is a re-start of the whole sequence
             step.startTime = this.durationTotal;
             step.endTime = this.durationTotal+step.duration;
@@ -212,72 +215,73 @@ Ani.AniSequence = function(){
     this.getStepCount = function(){
         return this.steps.length;
     };
+
+    Ani.register(this);
 };
 
-Ani.AniSequence.prototype = {
-    constructor: Ani.AniSequence,
-    getNewStep: function(ani){
-        var s = {
-            anis: null,
-            stepLength: 0,
-            duration: 0.0,
-            startTime: 0.0,
-            endTime: 0.0,
-            isFinished: function(){
-                var finished = true;
-                for (var a in this.anis){
-                    finished &= a.isEnded;
-                }
-                return finished;
-            },
-            start: function(){
-                for(var a in this.anis){
-                    a.start();
-                }
-            },
-            seekAll: function(val){
-                for(var a in this.anis){
-                    a.seek(val);
-                }
-            },
-            seek: function(val){
-                var seekTime = val*this.duration;
-                for(var a in this.anis){
-                    var aniSeekValue = Ani.Util.map(seekTime, 0.0, a.durationTotal, 0.0, 1.0);
-                    a.seek(aniSeekValue);
-                }
-            },
-            getTime: function(){
-                var currentTime = 0.0;
-                for(var a in this.anis){
-                    var seekValue = a.getSeek()*a.durationTotal;
-                    currentTime = Math.max(seekValue, currentTime);
-                }
-                return currentTime;
-            },
-            play: function(){
-                for(var a in this.anis){
-                    a.resume();
-                }
-            },
-            pause: function(){
-                for (var a in this.anis){
-                    a.pause();
-                }
+Ani.AniSequence.prototype.constructor = Ani.AniSequence;
+Ani.AniSequence.prototype.getNewStep = function(ani){
+    var s = {
+        anis: null,
+        stepLength: 0,
+        duration: 0.0,
+        startTime: 0.0,
+        endTime: 0.0,
+        isFinished: function(){
+            var finished = true;
+            for (var a in this.anis){
+                finished &= this.anis[a].isEnded;
             }
-        };
-        var init = function(s){
-            s.anis = (ani && ani.constructor === Array) ? ani : ((ani && [ani]) || []);
-            s.stepLength = s.anis.size();
-            s.duration = 0;
-            for(var a in s.anis){
-                a.setBegin();
-                a.seek(1.0);
-                // get the longest durationTotal of all anis in this step
-                s.duration = Math.max(a.durationTotal, s.duration);
+            return finished;
+        },
+        start: function(){
+            for(var a in this.anis){
+                this.anis[a].start();
             }
-        };
-        init(s);
-        return s;
-    }
+        },
+        seekAll: function(val){
+            for(var a in this.anis){
+                this.anis[a].seek(val);
+            }
+        },
+        seek: function(val){
+            var seekTime = val*this.duration;
+            for(var a in this.anis){
+                var aniSeekValue = Ani.Util.map(seekTime, 0.0, this.anis[a].durationTotal, 0.0, 1.0);
+                this.anis[a].seek(aniSeekValue);
+            }
+        },
+        getTime: function(){
+            var currentTime = 0.0;
+            for(var a in this.anis){
+                var seekValue = this.anis[a].getSeek()*this.anis[a].durationTotal;
+                currentTime = Math.max(seekValue, currentTime);
+            }
+            return currentTime;
+        },
+        play: function(){
+            for(var a in this.anis){
+                this.anis[a].resume();
+            }
+        },
+        pause: function(){
+            for (var a in this.anis){
+                this.anis[a].pause();
+            }
+        }
+    };
+    var init = function(s){
+        s.anis = (ani && ani.constructor === Array) ? ani : ((ani && [ani]) || []);
+        s.stepLength = s.anis.length;
+        s.duration = 0;
+        for(var i in s.anis){
+            var a = s.anis[i];
+            a.setBegin();
+            a.seek(1.0);
+            // get the longest durationTotal of all anis in this step
+            s.duration = Math.max(a.durationTotal, s.duration);
+        }
+    };
+    init(s);
+    return s;
 };

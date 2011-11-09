@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-		<meta charset="utf-8">
+    	<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<script src="https://github.com/neonux/requestAnimationFrame.js/raw/master/requestAnimationFrame.js"></script>
 		<script src="https://github.com/mrdoob/three.js/raw/master/build/Three.js"></script>
@@ -14,11 +14,14 @@
         <script src="../src/Ani.js"></script>
         <script type="text/javascript">
             var camera, scene, projector, renderer,
-    		    info, mouse = { x: 0, y: 0 }, sun, cube;
+    		    info, mouse = { x: 0, y: 0 }, sun, cube,
+                seq;
 
 			var bounce = 0;
 
             window.onload = function(){
+                seq = new Ani.AniSequence();
+
                 var container = document.createElement("div");
     			document.body.appendChild(container);
 
@@ -43,52 +46,22 @@
 				createCube(200, new THREE.Vector3(0,0,0));
 
 				//container.onmousemove = onDocumentMouseMove;
-				animate();
-            };
 
-            function createCube(s, p) {
-    			cube = new THREE.Mesh(
-					new THREE.CubeGeometry(s, s, s),
-					new THREE.MeshLambertMaterial({color: 0x003300})
-				);
+                seq.beginSequence();
 
-				cube.position = p;
-				scene.add(cube);
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.endStep();
 
-				THREE.Collisions.colliders.push(THREE.CollisionUtils.MeshOBB(cube));
-			};
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:2.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:2.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:500"}));
+                seq.endStep();
 
-            function animate() {
-
-    			requestAnimationFrame(animate);
-
-				var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-				projector.unprojectVector(vector, camera);
-
-				var ray = new THREE.Ray(camera.position, vector.subSelf( camera.position ).normalize());
-
-				var c = THREE.Collisions.rayCastNearest(ray);
-
-				if (c) {
-					c.mesh.materials[0].color.setHex(0xaa0000);
-				} else {
-					cube.materials[0].color.setHex( 0x003300 );
-				}
-
-
-				cube.rotation.x += 0.01;
-				cube.rotation.y += 0.02;
-				cube.position.x = Math.sin(bounce) * 100;
-				bounce += 0.01;
-
-				camera.lookAt(scene.position);
-
-				renderer.render(scene, camera);
-
-			};
-        </script>
-		<title>Ani demo</title>
-	</head>
-	<body>
-	</body>
-</html>
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:2.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
+ 

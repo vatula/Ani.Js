@@ -1,7 +1,41 @@
 var Ani = Ani || {};
 
-Ani.Ani = function(autostart, targetObject, durationEasing, durationDelay, targetObjectFieldName, end, easing, timeMode, callback){
-    Ani.AniCore.call(this, autostart, targetObject, durationEasing, durationDelay, targetObjectFieldName, end, easing, timeMode, callback);
+Ani.registrations = [];
+Ani.register = function(obj){
+    if (("pre" in obj) && (Ani.registrations.indexOf(obj) === -1)){
+        Ani.registrations.push(obj);
+    }
+};
+
+Ani.unregister = function(obj){
+    var index = Ani.registrations.indexOf(obj);
+    if (index != -1){
+        Ani.registrations.splice(index, 1);
+    }
+};
+
+Ani.update = function(){
+    var i = 0;
+    for (i; i < Ani.registrations.length; ++i){
+        Ani.registrations[i].pre();
+    }
+}
+
+Ani.Ani = function(op){
+    var defaults = {
+        autostart: Ani.Ani.defaultAutostartMode,
+        reverse: false,
+        target: null,
+        duration: 0.0,
+        delay: 0.0,
+        fieldName: "",
+        end: 0.0,
+        easing: new Ani.Easings.Linear(),
+        timeMode: Ani.Constants.SECONDS,
+        callback: ""
+    },
+    op = Ani.Util.merge(defaults, op);
+    Ani.AniCore.call(this, op.autostart, op.target, op.duration, op.delay, op.fieldName, op.end, op.easing, op.timeMode, op.callback);
 };
 
 Ani.Ani.prototype = new Ani.AniCore();
@@ -9,41 +43,52 @@ Ani.Ani.prototype.constructor = Ani.Ani;
 Ani.Ani.prototype.supr = Ani.AniCore.prototype;
 
 Ani.Ani.anisLookup = {};
-Ani.Ani.defaultTimeMode = Ani.Constants.SECONDS;
-Ani.Ani.defaultEasing = new Ani.Easings.Linear();
 Ani.Ani.defaultAutostartMode = Ani.Constants.AUTOSTART;
-Ani.Ani.defaultCallback = "";
 Ani.Ani.defaultOverwriteMode = Ani.Constants.OVERWRITE;
 
 // create a new Ani instance and add to lookup
 // or overwrite an existing Ani with new parameters
-Ani.Ani.to = function(theReverse, theTarget, theDuration, theDelay, theFieldName, theEnd, theEasing, theTimeMode, theCallback){
-    var fields = theFieldName.split(/\s*,\s*/);
+Ani.Ani.to = function(op){
+    var defaults = {
+        autostart: Ani.Ani.defaultAutostartMode,
+        reverse: false,
+        target: null,
+        duration: 0.0,
+        delay: 0.0,
+        fieldName: "",
+        end: 0.0,
+        easing: new Ani.Easings.Linear(),
+        timeMode: Ani.Constants.SECONDS,
+        callback: ""
+    },
+    op = Ani.Util.merge(defaults, op);
+
+    var fields = op.fieldName.split(/\s*,\s*/);
     if (fields.length === 1){
         Ani.Ani.cleanAnis();
-        var id = theTarget.toString() + "_" + theFieldName;
+        var id = Ani.Util.fnv1aHash(op.target.constructor.toString()) + "_" + op.fieldName;
 
         // get old Ani and overwrite (this is behavior is ignored if defaultAddMode is set to NO_OVERWRITE
         if (Ani.Ani.anisLookup.hasOwnProperty(id) && Ani.Ani.defaultOverwriteMode === Ani.Constants.OVERWRITE) {
             var existingAni = Ani.Ani.anisLookup[id];
 
-            existingAni.setDuration(theDuration);
-            existingAni.setDelay(theDelay);
-            existingAni.setEasing(theEasing);
-            existingAni.timeMode = theTimeMode;
-            existingAni.setCallback(theCallback);
+            existingAni.setDuration(op.duration);
+            existingAni.setDelay(op.delay);
+            existingAni.setEasing(op.easing);
+            existingAni.timeMode = op.timeMode;
+            existingAni.setCallback(op.callback);
             existingAni.setBegin();
-            existingAni.setEnd(theEnd);
+            existingAni.setEnd(op.end);
             existingAni.seek(0.0);
 
             // Ani.to or Ani.from?
-            if (theReverse) {
+            if (op.reverse) {
                 existingAni.reverse();
             }
             return existingAni;
         } else { // create new Ani
-            var newAni = new Ani.Ani(theTarget, theDuration, theDelay, theFieldName, theEnd, theEasing, theCallback);
-            if (theReverse) {
+            var newAni = new Ani.Ani(op);
+            if (op.reverse) {
                 newAni.reverse();
             }
             Ani.Ani.anisLookup[id] = newAni;
@@ -52,11 +97,12 @@ Ani.Ani.to = function(theReverse, theTarget, theDuration, theDelay, theFieldName
     } else {
         var anis = [];
         for (var f in fields){
-            var p = f.split(/\s*:\s*/);
+            var p = fields[f].split(/\s*:\s*/);
             if (p.length === 2){
                 var fieldName = p[0],
                     end = parseFloat(p[1]);
-                anis.push(Ani.Ani.to(theReverse, theTarget, theDuration, theDelay, fieldName, end, theEasing, theTimeMode, theCallback));
+                op = Ani.Util.merge(op, {end: end, fieldName: fieldName})
+                anis.push(Ani.Ani.to(op));
             }
         }
         return anis;

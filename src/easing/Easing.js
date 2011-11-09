@@ -15,28 +15,28 @@ Ani.Easings.Easing.prototype = {
     /**
      * Calc easing: map time to position.
      *
-	 * @param t the time
+     * @param t the time
 	 * @param b the begin
 	 * @param c the change
 	 * @param d the duration
 	 * @return the float
 	 */
-    calcEasing: function(f, b, c, d){
+    calcEasing: function(t, b, c, d){
         var out = 0.0,
             mode = Ani.Constants;
 
-        switch(easingMode){
+        switch(this.easingMode){
             case mode.IN:
-                out = easeIn(t, b, c, d);
+                out = this.easeIn(t, b, c, d);
                 break;
             case mode.IN_OUT:
-                out = easeInOut(t, b, c, d);
+                out = this.easeInOut(t, b, c, d);
                 break;
             case mode.OUT:
-                out = easeOut(t, b, c, d);
+                out = this.easeOut(t, b, c, d);
                 break;
             default:
-                out = easeOut(t, b, c, d);
+                out = this.easeOut(t, b, c, d);
                 break;
         }
         return out;
