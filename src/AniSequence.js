@@ -230,7 +230,7 @@ Ani.AniSequence.prototype.getNewStep = function(ani){
         isFinished: function(){
             var finished = true;
             for (var a in this.anis){
-                finished &= this.anis[a].isEnded;
+                finished = finished && this.anis[a].isEnded;
             }
             return finished;
         },

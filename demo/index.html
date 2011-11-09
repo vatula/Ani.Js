@@ -20,6 +20,7 @@
 			var bounce = 0;
 
             window.onload = function(){
+                info = document.getElementById("info");
                 seq = new Ani.AniSequence();
 
                 var container = document.createElement("div");
@@ -44,8 +45,6 @@
 				scene.add(sun);
 
 				createCube(200, new THREE.Vector3(0,0,0));
-
-				//container.onmousemove = onDocumentMouseMove;
 
                 seq.beginSequence();
 
@@ -87,7 +86,7 @@
 
                 seq.beginStep();
                 seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:5.5,y:5.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:5.5,y:5.5"}));
                 seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:500"}));
                 seq.endStep();
 
@@ -132,6 +131,7 @@
     			requestAnimationFrame(animate);
 
                 Ani.update();
+                info.innerHTML = "bounce: "+bounce+", <br/>cube.rotation.x: "+cube.rotation.x+", <br/>cube.rotation.y: "+cube.rotation.y;
 				var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
 				projector.unprojectVector(vector, camera);
 
@@ -146,10 +146,7 @@
 				}
 
 
-				//cube.rotation.x += 0.01;
-				//cube.rotation.y += 0.02;
-				cube.position.x = Math.sin(bounce) * 100;
-				bounce += 0.01;
+				//cube.position.x = Math.sin(bounce) * 100;
 
 				camera.lookAt(scene.position);
 
@@ -160,5 +157,6 @@
 		<title>Ani demo</title>
 	</head>
 	<body>
+        <div id="info"></div>
 	</body>
 </html>

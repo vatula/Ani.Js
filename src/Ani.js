@@ -19,7 +19,7 @@ Ani.update = function(){
     for (i; i < Ani.registrations.length; ++i){
         Ani.registrations[i].pre();
     }
-}
+};
 
 Ani.Ani = function(op){
     var defaults = {
@@ -65,6 +65,14 @@ Ani.Ani.to = function(op){
 
     var fields = op.fieldName.split(/\s*,\s*/);
     if (fields.length === 1){
+
+        // In case we defined single property in a multiproperty way (i.e. using “var:val” syntax)
+        var p = fields[0].split(/\s*:\s*/);
+        if (p.length === 2){
+            op.fieldName = p[0];
+            op.end = parseFloat(p[1]) || op.end;
+        }
+
         Ani.Ani.cleanAnis();
         var id = Ani.Util.fnv1aHash(op.target.constructor.toString()) + "_" + op.fieldName;
 
