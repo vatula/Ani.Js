@@ -64,4 +64,101 @@
                 seq.beginStep();
                 seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:2.5"}));
                 seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
- 
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:1000"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:2.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:3000"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:5.5,y:5.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:500"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.endStep();
+
+                seq.beginStep();
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.endStep();
+
+                seq.endSequence();
+
+                seq.start();
+				animate();
+            };
+
+            function createCube(s, p) {
+    			cube = new THREE.Mesh(
+					new THREE.CubeGeometry(s, s, s),
+					new THREE.MeshLambertMaterial({color: 0x003300})
+				);
+
+				cube.position = p;
+				scene.add(cube);
+
+				THREE.Collisions.colliders.push(THREE.CollisionUtils.MeshOBB(cube));
+			};
+
+            function animate() {
+
+    			requestAnimationFrame(animate);
+
+                Ani.update();
+				var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+				projector.unprojectVector(vector, camera);
+
+				var ray = new THREE.Ray(camera.position, vector.subSelf( camera.position ).normalize());
+
+				var c = THREE.Collisions.rayCastNearest(ray);
+
+				if (c) {
+					c.mesh.materials[0].color.setHex(0xaa0000);
+				} else {
+					cube.materials[0].color.setHex( 0x003300 );
+				}
+
+
+				//cube.rotation.x += 0.01;
+				//cube.rotation.y += 0.02;
+				cube.position.x = Math.sin(bounce) * 100;
+				bounce += 0.01;
+
+				camera.lookAt(scene.position);
+
+				renderer.render(scene, camera);
+
+			};
+        </script>
+		<title>Ani demo</title>
+	</head>
+	<body>
+	</body>
+</html>
