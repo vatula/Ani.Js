@@ -24,8 +24,8 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 
     this.easing = easing || new Ani.Easings.Linear();
 
-    this.callbackStartMethod = "";
-    this.callbackFinishMethod = "";
+    this.callbackStartMethod = null; // on animation start
+    this.callbackFinishMethod = null; // on animation finish
 
     this.playMode = Ani.Constants.FORWARD;
     this.playDirection = Ani.Constants.FORWARD;
@@ -67,38 +67,21 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
         this.easing = easing || new Ani.Easings.Linear();
     };
     this.setCallback = function(callback){
-        // ignore empty strings
         if (callback){
-            var rec = /\s*,\s*/,
-                red = /\s*:\s*/;
-            var propertyList = callback.split(rec);
-            for(var prop in propertyList){
-                var p = propertyList[prop].split(red);
-                if (p.length === 2){
-                    if (p[0] === Ani.Constants.ON_START || p[0] === Ani.Constants.ON_END){
-                        var targetMethod = p[1];
-                        if (targetMethod in this.targetObject){
-                            if (p[0] === Ani.Constants.ON_START){
-                                this.callbackStartMethod = targetMethod;
-                            } else if (p[0] === Ani.Constants.ON_END){
-                                this.callbackFinishMethod = targetMethod;
-                            }
-                        }
-                    }
-                }
-            }
+            this.callbackStartMethod = callback.onStart || null;
+            this.callbackFinishMethod = callback.onEnd || null;
         }
     };
 
     var dispatchOnStart = function(){
         if (this.callbackStartMethod){
-            this.targetObject[this.callbackStartMethod]();
+            this.callbackStartMethod.call(this, this);
         }
     };
 
     var dispatchOnEnd = function(){
         if (this.callbackFinishMethod){
-            this.targetObject[this.callbackFinishMethod]();
+            this.callbackFinishMethod.call(this, this);
         }
     };
 
@@ -126,7 +109,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
         this.isEnded = false;
     };
 
-    var end = function(){
+    var endAnimation = function(){
         this.isDelaying = false;
         this.seek(1.0);
         this.isPlaying = false;
@@ -159,7 +142,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
                         this.isRepeating = false;
                     }
                 } else {
-                    end.call(this);
+                    endAnimation.call(this);
                 }
             } else {
                 updatePosition.call(this);
