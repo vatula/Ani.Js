@@ -160,18 +160,16 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     };
 
     var getTime = function(){
-        var date = new Date();
         return (this.timeMode === Ani.Constants.SECONDS) ?
-            ((date.getTime() - this.beginTime) / 1000) :
-            ((date.getTime() - this.beginTime) / 1000); // TODO: (papplet.frameCount - beginTime);
+            ((Date.now() - this.beginTime) / 1000) :
+            ((Date.now() - this.beginTime) / 1000); // TODO: (papplet.frameCount - beginTime);
     };
 
     var setTime = function(theTime){
-        var date = new Date();
         this.time = theTime;
         this.beginTime = (this.timeMode === Ani.Constants.SECONDS) ?
-            (date.getTime() - this.time*1000) :
-            (date.getTime() - this.time*1000); // TODO: (papplet.frameCount - time);
+            (Date.now() - this.time*1000) :
+            (Date.now() - this.time*1000); // TODO: (papplet.frameCount - time);
     };
 
     /**
