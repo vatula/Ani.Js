@@ -1,5 +1,3 @@
-var Ani = Ani || {};
-
 Ani.Easings = Ani.Easings || {};
 
 /**

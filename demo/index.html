@@ -5,22 +5,36 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<script src="https://github.com/neonux/requestAnimationFrame.js/raw/master/requestAnimationFrame.js"></script>
 		<script src="https://github.com/mrdoob/three.js/raw/master/build/Three.js"></script>
+        <script src="../src/Init.js"></script>
         <script src="../src/AniConstants.js"></script>
+        <script src="../src/AniUtil.js"></script>
         <script src="../src/easing/Easing.js"></script>
         <script src="../src/easing/Linear.js"></script>
-        <script src="../src/AniUtil.js"></script>
         <script src="../src/AniCore.js"></script>
-        <script src="../src/AniSequence.js"></script>
         <script src="../src/Ani.js"></script>
+        <script src="../src/AniSequence.js"></script>
+
         <script type="text/javascript">
             var camera, scene, projector, renderer,
-    		    info, mouse = { x: 0, y: 0 }, sun, cube,
-                seq;
+    		    info, btnPlayPause, sun, cube,
+                seq, yoyo;
 
 			var bounce = 0;
 
             window.onload = function(){
                 info = document.getElementById("info");
+                btnPlayPause = document.getElementById("btnPlayPause");
+                btnPlayPause.innerHTML = "Pause";
+                btnPlayPause.addEventListener("click", function(){
+                    if (!seq.isPlaying && !seq.isEnded){
+                        btnPlayPause.innerHTML = "Pause";
+                        seq.resume();
+                    } else {
+                        btnPlayPause.innerHTML = "Play";
+                        seq.pause();
+                    }
+                }, false);
+
                 seq = new Ani.AniSequence();
 
                 var container = document.createElement("div");
@@ -49,68 +63,75 @@
                 seq.beginSequence();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: {x:0.5,y:0.5}}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:2.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:2.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:500"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:2.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: {x:2.5,y:0.5}}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:500"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:2.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:1000"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:2.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:2.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:1000"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:2.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:2.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:3000"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: {x:2.5,y:0.5}}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: {x:0.5,y:2.5}}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: {bounce:3000}}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:5.5,y:5.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:5.5,y:5.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:500"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:5.5,y:5.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:5.5,y:5.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:500"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, fieldName: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, fieldName: "bounce:100"}));
+                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:45.5,y:0.5"}));
+                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:15.5"}));
+                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.endSequence();
 
                 seq.start();
+
+                /*
+                yoyo = Ani.Ani.to({target: cube.rotation, targetFields: {x: 5, y: 5}, duration: 3, playMode: Ani.Constants.YOYO});
+                for (var i in yoyo){
+                    yoyo[i].repeat();
+                }
+                */
 				animate();
             };
 
@@ -122,8 +143,6 @@
 
 				cube.position = p;
 				scene.add(cube);
-
-				THREE.Collisions.colliders.push(THREE.CollisionUtils.MeshOBB(cube));
 			};
 
             function animate() {
@@ -132,21 +151,6 @@
 
                 Ani.update();
                 info.innerHTML = "bounce: "+bounce+", <br/>cube.rotation.x: "+cube.rotation.x+", <br/>cube.rotation.y: "+cube.rotation.y;
-				var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-				projector.unprojectVector(vector, camera);
-
-				var ray = new THREE.Ray(camera.position, vector.subSelf( camera.position ).normalize());
-
-				var c = THREE.Collisions.rayCastNearest(ray);
-
-				if (c) {
-					c.mesh.materials[0].color.setHex(0xaa0000);
-				} else {
-					cube.materials[0].color.setHex( 0x003300 );
-				}
-
-
-				//cube.position.x = Math.sin(bounce) * 100;
 
 				camera.lookAt(scene.position);
 
@@ -154,9 +158,22 @@
 
 			};
         </script>
+        <style>
+            .infoBox {
+                position: absolute;
+                z-index: 9999;
+            }
+
+            body {
+                overflow: hidden;
+            }
+        </style>
 		<title>Ani demo</title>
 	</head>
 	<body>
-        <div id="info"></div>
+        <div class="infoBox">
+            <button id="btnPlayPause" type="button"></button>
+            <div id="info"></div>
+        </div>
 	</body>
 </html>

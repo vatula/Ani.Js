@@ -1,5 +1,3 @@
-var Ani = Ani || {};
-
 Ani.registrations = [];
 Ani.register = function(obj){
     if (("pre" in obj) && (Ani.registrations.indexOf(obj) === -1)){
@@ -32,7 +30,7 @@ Ani.Ani = function(op){
         end: 0.0,
         easing: new Ani.Easings.Linear(),
         timeMode: Ani.Constants.SECONDS,
-        callback: ""
+        callback: null
     },
     op = Ani.Util.merge(defaults, op);
     Ani.AniCore.call(this, op.autostart, op.target, op.duration, op.delay, op.fieldName, op.end, op.easing, op.timeMode, op.callback);
@@ -55,85 +53,105 @@ Ani.Ani.to = function(op){
         target: null,
         duration: 0.0,
         delay: 0.0,
-        fieldName: "",
-        end: 0.0,
+        targetFields: "",
         easing: new Ani.Easings.Linear(),
         timeMode: Ani.Constants.SECONDS,
-        callback: ""
+        callback: null
     },
-    op = Ani.Util.merge(defaults, op);
+    op = Ani.Util.merge(defaults, op),
+    aniOp = {
+        autostart: op.autostart,
+        reverse: op.reverse,
+        target: op.target,
+        duration: op.duration,
+        delay: op.delay,
+        fieldName: "",
+        end: 0.0,
+        easing: op.easing,
+        timeMode: op.timeMode,
+        callback: op.callback
+    },
+    p;
 
-    var fields = op.fieldName.split(/\s*,\s*/);
-    if (fields.length === 1){
+    var transformTargetFields = function(targetFields){
+        var type = typeof targetFields,
+            result = {}, kv, i=0;
 
-        // In case we defined single property in a multiproperty way (i.e. using “var:val” syntax)
-        var p = fields[0].split(/\s*:\s*/);
-        if (p.length === 2){
-            op.fieldName = p[0];
-            op.end = parseFloat(p[1]) || op.end;
+        if (type === "string"){ // "x: a[, y: b]…"
+            var coma = /\s*,\s*/,
+                colon = /\s*:\s*/;
+            targetFields = targetFields.split(coma);
+            for(i; i<targetFields.length; ++i){
+                kv = targetFields[i].split(colon);
+                result[kv[0]] = parseFloat(kv[1]);
+            }
+        } else if (type === "object"){ // {x: a, y: b}
+            result = targetFields;
         }
+        return result;
+    };
+
+    var fields = transformTargetFields(op.targetFields),
+        anis = [],
+        ani;
+
+    for(p in fields){
+        aniOp.fieldName = p;
+        aniOp.end = fields[p];
 
         Ani.Ani.cleanAnis();
-        var id = Ani.Util.fnv1aHash(op.target.constructor.toString()) + "_" + op.fieldName;
 
-        // get old Ani and overwrite (this is behavior is ignored if defaultAddMode is set to NO_OVERWRITE
-        if (Ani.Ani.anisLookup.hasOwnProperty(id) && Ani.Ani.defaultOverwriteMode === Ani.Constants.OVERWRITE) {
-            var existingAni = Ani.Ani.anisLookup[id];
+        var ani_uid = aniOp.target.ani_uid+"_"+aniOp.fieldName;
+        if ((Ani.Ani.defaultOverwriteMode === Ani.Constants.OVERWRITE) && (ani_uid in Ani.Ani.anisLookup)){
+            ani = Ani.Ani.anisLookup[ani_uid];
 
-            existingAni.setDuration(op.duration);
-            existingAni.setDelay(op.delay);
-            existingAni.setEasing(op.easing);
-            existingAni.timeMode = op.timeMode;
-            existingAni.setCallback(op.callback);
-            existingAni.setBegin();
-            existingAni.setEnd(op.end);
-            existingAni.seek(0.0);
-
-            // Ani.to or Ani.from?
-            if (op.reverse) {
-                existingAni.reverse();
-            }
-            return existingAni;
-        } else { // create new Ani
-            var newAni = new Ani.Ani(op);
-            if (op.reverse) {
-                newAni.reverse();
-            }
-            Ani.Ani.anisLookup[id] = newAni;
-            return newAni;
+            ani.setDuration(aniOp.duration);
+            ani.setDelay(aniOp.delay);
+            ani.setEasing(aniOp.easing);
+            ani.timeMode = aniOp.timeMode;
+            ani.setCallback(aniOp.callback);
+            ani.setBegin();
+            ani.setEnd(aniOp.end);
+            ani.seek(0.0);
+        } else {
+            ani = new Ani.Ani(aniOp);
+            Ani.Ani.anisLookup[ani_uid] = ani;
         }
-    } else {
-        var anis = [];
-        for (var f in fields){
-            var p = fields[f].split(/\s*:\s*/);
-            if (p.length === 2){
-                var fieldName = p[0],
-                    end = parseFloat(p[1]);
-                op = Ani.Util.merge(op, {end: end, fieldName: fieldName})
-                anis.push(Ani.Ani.to(op));
-            }
+
+        if (aniOp.reverse){
+            ani.reverse();
         }
-        return anis;
+        anis.push(ani);
     }
+    return anis;
 };
 
 // remove finished ani form lookup
 // so that there will be no reference to the object and the garbage collector can delete it
 Ani.Ani.cleanAnis = function(){
-    Ani.Ani.anisLookup = {};
+    var i, ani;
+    for(i in Ani.Ani.anisLookup){
+        ani = Ani.Ani.anisLookup[i];
+        if (ani.isEnded){
+            delete Ani.Ani.anisLookup[i];
+        }
+    }
 };
 
 /**
  * kills all anis of the lookup table in Ani
  */
 Ani.Ani.killAll = function(){
-    for (var p in Ani.Ani.anisLookup){
+    var p;
+    for (p in Ani.Ani.anisLookup){
         if (Ani.Ani.anisLookup.hasOwnProperty(p)){
             var ani = Ani.Ani.anisLookup[p];
             ani.pause();
+            Ani.unregister(ani);
+            ani = null;
+            delete Ani.Ani.anisLookup[p];
         }
     }
-    Ani.Ani.cleanAnis();
 };
 
 /**

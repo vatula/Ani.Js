@@ -1,10 +1,6 @@
-var Ani = Ani || {};
-
 Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, targetObjectFieldName, end, easing, timeMode, callback){
 
-    this.targetName = targetObject ? Ani.Util.fnv1aHash(targetObject.constructor.toString()).toString() : "";
     this.fieldName = targetObjectFieldName || "";
-    this.id = this.targetName+"_"+this.fieldName;
 
     this.isRegistered = false;
     this.targetObject = targetObject || null;

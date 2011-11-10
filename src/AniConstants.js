@@ -1,5 +1,3 @@
-var Ani = Ani || {};
-
 Ani.Constants = Ani.Constants || {
     VERSION: "2.0",
 
