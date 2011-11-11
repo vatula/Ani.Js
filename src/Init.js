@@ -32,14 +32,14 @@ var Ani = Ani || (function(){ // define unique ani id for any object
          * Sets the defaultAutostartMode of all new created Animations to: On
          */
         autostart: function(){
-            defaultAutostartMode = Ani.Constants.AUTOSTART;
+            this.defaultAutostartMode = Ani.Constants.AUTOSTART;
         },
 
         /**
          * Sets the defaultAutostartMode of all new created Animations to: Off
          */
         noAutostart: function(){
-            defaultAutostartMode = Ani.Constants.NO_AUTOSTART;
+            this.defaultAutostartMode = Ani.Constants.NO_AUTOSTART;
         },
 
         /**
@@ -47,7 +47,7 @@ var Ani = Ani || (function(){ // define unique ani id for any object
          * Enable overwrite manager of all on going animations to avoid any possible conflicts
          */
         overwrite: function(){
-            defaultOverwriteMode = Ani.Constants.OVERWRITE;
+            this.defaultOverwriteMode = Ani.Constants.OVERWRITE;
         },
 
         /**
@@ -56,7 +56,7 @@ var Ani = Ani || (function(){ // define unique ani id for any object
          * A new ani instance is always created even if there is a potential conflict for an already existing animation
          */
         noOverwrite: function(){
-            defaultOverwriteMode = Ani.Constants.NO_OVERWRITE;
+            this.defaultOverwriteMode = Ani.Constants.NO_OVERWRITE;
         },
 
         /**
@@ -111,8 +111,8 @@ var Ani = Ani || (function(){ // define unique ani id for any object
             }
         },
         update: function(){
-            var i = 0;
-            for (i; i < registrations.length; ++i){
+            var i;
+            for (i = 0; i < registrations.length; ++i){
                 registrations[i].pre();
             }
         },
@@ -126,13 +126,13 @@ var Ani = Ani || (function(){ // define unique ani id for any object
 
             var transformTargetFields = function(targetFields){
                 var type = typeof targetFields,
-                    result = {}, kv, i=0;
+                    result = {}, kv, i;
 
                 if (type === "string"){ // "x: a[, y: b]…"
                     var coma = /\s*,\s*/,
                         colon = /\s*:\s*/;
                     targetFields = targetFields.split(coma);
-                    for(i; i<targetFields.length; ++i){
+                    for(i = 0; i<targetFields.length; ++i){
                         kv = targetFields[i].split(colon);
                         result[kv[0]] = parseFloat(kv[1]);
                     }

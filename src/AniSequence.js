@@ -217,6 +217,7 @@ Ani.AniSequence = function(){
     Ani.register(this);
 };
 
+Ani.AniSequence.prototype = new Object();
 Ani.AniSequence.prototype.constructor = Ani.AniSequence;
 Ani.AniSequence.prototype.getStep = function(ani){
     var step = {
