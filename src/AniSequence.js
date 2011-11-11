@@ -85,12 +85,12 @@ Ani.AniSequence = function(){
                     this.add(anis[pa]);
                 }
             }
-        } else if (anis && anis.constructor === Ani.Ani){
+        } else if (anis && anis.constructor === Ani.Animation){
             var ani = anis;
             if (this.addParallel){
                 this.addParallelAnisCollector.push(ani);
             } else {
-                var s = this.getNewStep(ani);
+                var s = this.getStep(ani);
                 this.steps.push(s);
             }
         }
@@ -109,7 +109,7 @@ Ani.AniSequence = function(){
 	 */
     this.endStep = function(){
         var anis = this.addParallelAnisCollector.slice(), // clone array
-            step = this.getNewStep(anis);
+            step = this.getStep(anis);
         this.steps.push(step);
         this.addParallel = false;
     };
@@ -150,8 +150,8 @@ Ani.AniSequence = function(){
 	 */
     this.beginSequence = function(){
         // disable autostart feature of Ani
-        Ani.Ani.noAutostart();
-        Ani.Ani.noOverwrite();
+        Ani.noAutostart();
+        Ani.noOverwrite();
     };
 
     /**
@@ -159,8 +159,8 @@ Ani.AniSequence = function(){
 	 */
     this.endSequence = function(){
         // enable autostart feature of Ani
-        Ani.Ani.autostart();
-        Ani.Ani.overwrite();
+        Ani.autostart();
+        Ani.overwrite();
         reconstruct.call(this);
     };
 
@@ -218,8 +218,8 @@ Ani.AniSequence = function(){
 };
 
 Ani.AniSequence.prototype.constructor = Ani.AniSequence;
-Ani.AniSequence.prototype.getNewStep = function(ani){
-    var s = {
+Ani.AniSequence.prototype.getStep = function(ani){
+    var step = {
         anis: null,
         stepLength: 0,
         duration: 0.0,
@@ -268,18 +268,17 @@ Ani.AniSequence.prototype.getNewStep = function(ani){
             }
         }
     };
-    var init = function(s){
-        s.anis = (ani && ani.constructor === Array) ? ani : ((ani && [ani]) || []);
-        s.stepLength = s.anis.length;
-        s.duration = 0;
-        for(var i in s.anis){
-            var a = s.anis[i];
-            a.setBegin();
-            a.seek(1.0);
-            // get the longest durationTotal of all anis in this step
-            s.duration = Math.max(a.durationTotal, s.duration);
-        }
-    };
-    init(s);
-    return s;
+
+    step.anis = (ani && ani.constructor === Array) ? ani : ((ani && [ani]) || []);
+    step.stepLength = step.anis.length;
+    step.duration = 0;
+    for(var i in step.anis){
+        var a = step.anis[i];
+        a.setBegin();
+        a.seek(1.0);
+        // get the longest durationTotal of all anis in this step
+        step.duration = Math.max(a.durationTotal, step.duration);
+    }
+
+    return step;
 };

@@ -17,12 +17,12 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 
     // durationEasing + durationDelay = durationTotal
     this.durationTotal = this.durationEasing + this.durationDelay;
-    this.timeMode = timeMode || "";
+    this.timeMode = timeMode || Ani.defaultTimeMode;
 
     // stopwatch timer for pause and resume
     this.pauseTime = 0.0;
 
-    this.easing = easing || new Ani.Easings.Linear();
+    this.easing = easing || Ani.defaultEasing;
 
     this.callbackStartMethod = null; // on animation start
     this.callbackFinishMethod = null; // on animation finish
@@ -44,8 +44,8 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
 	 * @return true, if successful
 	 */
     this.setBegin = function(theBegin){
-        if (typeof theBegin != "undefined"){
-            this.begin = theBegin;
+        if (!isNaN(theBegin)){
+            this.begin = parseFloat(theBegin);
             this.change = this.end - this.begin;
             return true;
         } else {
@@ -64,7 +64,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     };
 
     this.setEasing = function(easing){
-        this.easing = easing || new Ani.Easings.Linear();
+        this.easing = easing || Ani.defaultEasing;
     };
     this.setCallback = function(callback){
         if (callback){
@@ -324,6 +324,5 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
      }
 };
 
-Ani.AniCore.prototype = {
-    constructor: Ani.AniCore
-};
+Ani.AniCore.prototype = new Object();
+Ani.AniCore.prototype.constructor = Ani.AniCore;

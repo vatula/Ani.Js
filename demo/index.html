@@ -35,6 +35,8 @@
                     }
                 }, false);
 
+                Ani.init();
+
                 seq = new Ani.AniSequence();
 
                 var container = document.createElement("div");
@@ -63,65 +65,65 @@
                 seq.beginSequence();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, callback: {onEnd: function(a){
+                seq.add(Ani.to({target: cube.rotation, duration: 5, callback: {onEnd: function(a){
                     console.log(a.ani_uid + " animation compleated");
                 }}, targetFields: {x:0.5,y:0.5}}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:2.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: {x:2.5,y:0.5}}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:500"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:2.5,y:0.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: {x:2.5,y:0.5}}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:500"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:2.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:2.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:1000"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:2.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:2.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:1000"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: {x:2.5,y:0.5}}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: {x:0.5,y:2.5}}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: {bounce:3000}}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: {x:2.5,y:0.5}}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: {x:0.5,y:2.5}}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: {bounce:3000}}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:5.5,y:5.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:5.5,y:5.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:500"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:5.5,y:5.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:5.5,y:5.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:500"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:0.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.beginStep();
-                seq.add(Ani.Ani.to({target: cube.rotation, duration: 5, targetFields: "x:45.5,y:0.5"}));
-                seq.add(Ani.Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:15.5"}));
-                seq.add(Ani.Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
+                seq.add(Ani.to({target: cube.rotation, duration: 5, targetFields: "x:45.5,y:0.5"}));
+                seq.add(Ani.to({target: cube.position, duration: 5, targetFields: "x:0.5,y:15.5"}));
+                seq.add(Ani.to({target: window, duration: 5, targetFields: "bounce:100"}));
                 seq.endStep();
 
                 seq.endSequence();
