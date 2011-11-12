@@ -4,7 +4,7 @@ Ani.Easings = Ani.Easings || {};
  * Class Easing, which maps time to position.
  */
 Ani.Easings.Easing = function(easingMode){
-    this.easingMode = easingMode || Ani.Constants.OUT;
+    this.easingMode = (easingMode === undefined || easingMode === null) ? Ani.Constants.OUT : easingMode;
 };
 
 Ani.Easings.Easing.prototype = {
@@ -42,7 +42,7 @@ Ani.Easings.Easing.prototype = {
 
     /**
 	 * Set the shape mode
-	 * @param theEasingMode IN, OUT, IN_OUT
+	 * @param easingMode IN, OUT, IN_OUT
 	 */
     setMode: function(easingMode){
         this.easingMode = easingMode;

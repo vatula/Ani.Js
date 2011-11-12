@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+try:
+    import argparse
+    ap = True
+except ImportError:
+    import optparse
+    ap = False
 
 import sys
 import os
@@ -27,6 +33,21 @@ sources_all = [
     "AniCore.js",
     "Ani.js"
 ];
+
+def parse_args():
+    if ap:
+        parser = argparse.ArgumentParser(description="Build and compress Ani.js")
+        parser.add_argument("--minified", help="Generate minified version", action="store_const", const=True, default=False)
+
+        args = parser.parse_args()
+    else:
+        parser = optparse.OptionParser(description="Build and compress Ani.js")
+        parser.add_option("--minified", help="Generate minified versions", action="store_const", const=True, default=False)
+
+        args, remainder = parser.parse_args()
+
+    return args
+
 
 def merge(files):
     buffer = []
@@ -60,7 +81,7 @@ def output(text, filename):
 def add_header(text, filename):
     return ("// — %s, http://github.com/vatula/Ani.Js %s" % (filename, os.linesep)) + text
 
-def build_lib(files, filename):
+def build_lib(files, filename, minified):
     text = merge(files)
 
     folder = ""
@@ -69,13 +90,14 @@ def build_lib(files, filename):
     print "Compiling", filename
     print "="*40
 
-    text = compress(text)
+    text = compress(text) if minified else text
 
     output(add_header(text, filename), folder+filename)
 
 def main(argv=None):
-    files = sources_all;
-    build_lib(files, "Ani.js")
+    files = sources_all
+    args = parse_args()
+    build_lib(files, "Ani.js", args.minified)
 
 if __name__ == "__main__":
     main()

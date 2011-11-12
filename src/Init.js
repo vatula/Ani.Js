@@ -66,9 +66,11 @@ var Ani = Ani || (function(){ // define unique ani id for any object
         cleanAnis: function(){
             var i, ani;
             for(i in this.anisLookup){
-                ani = this.anisLookup[i];
-                if (ani.isEnded){
-                    delete this.anisLookup[i];
+                if (this.anisLookup.hasOwnProperty(i)){
+                    ani = this.anisLookup[i];
+                    if (ani.isEnded){
+                        delete this.anisLookup[i];
+                    }
                 }
             }
         },
@@ -107,7 +109,7 @@ var Ani = Ani || (function(){ // define unique ani id for any object
         unregister: function(obj){
             var index = registrations.indexOf(obj);
             if (index != -1){
-                registrations.splice(index, 1);
+                registrations = registrations.splice(index, 1);
             }
         },
         update: function(){
@@ -146,32 +148,34 @@ var Ani = Ani || (function(){ // define unique ani id for any object
                 anis = [], ani, p;
 
             for(p in fields){
-                op.fieldName = p;
-                op.end = fields[p];
+                if (fields.hasOwnProperty(p)){
+                    op.fieldName = p;
+                    op.end = fields[p];
 
-                this.cleanAnis();
+                    this.cleanAnis();
 
-                var ani_uid = op.target.ani_uid+"_"+op.fieldName;
-                if ((this.defaultOverwriteMode === Ani.Constants.OVERWRITE) && (ani_uid in this.anisLookup)){
-                    ani = this.anisLookup[ani_uid];
+                    var ani_uid = op.target.ani_uid+"_"+op.fieldName;
+                    if ((this.defaultOverwriteMode === Ani.Constants.OVERWRITE) && (ani_uid in this.anisLookup)){
+                        ani = this.anisLookup[ani_uid];
 
-                    ani.setDuration(op.duration);
-                    ani.setDelay(op.delay);
-                    ani.setEasing(op.easing);
-                    ani.timeMode = op.timeMode;
-                    ani.setCallback(op.callback);
-                    ani.setBegin();
-                    ani.setEnd(op.end);
-                    ani.seek(0.0);
-                } else {
-                    ani = new Ani.Animation(op);
-                    this.anisLookup[ani_uid] = ani;
+                        ani.setDuration(op.duration);
+                        ani.setDelay(op.delay);
+                        ani.setEasing(op.easing);
+                        ani.timeMode = op.timeMode;
+                        ani.setCallback(op.callback);
+                        ani.setBegin();
+                        ani.setEnd(op.end);
+                        ani.seek(0.0);
+                    } else {
+                        ani = new Ani.Animation(op);
+                        this.anisLookup[ani_uid] = ani;
+                    }
+
+                    if (op.reverse){
+                        ani.reverse();
+                    }
+                    anis.push(ani);
                 }
-
-                if (op.reverse){
-                    ani.reverse();
-                }
-                anis.push(ani);
             }
             return anis;
         }
