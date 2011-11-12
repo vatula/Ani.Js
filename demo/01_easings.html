@@ -3,23 +3,45 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <style type="text/css">
+            .graph {
+                display: inline-block;
+                margin: 0 12px;
+            }
+
+            .graph h4 {
+                font: normal normal normal 14px/18px Arial, Helvetica, sans-serif;
+            }
+        </style>
         <script src="../build/Ani.js"></script>
         <script type="text/javascript">
             var seq, el = function(e){return document.createElement(e)}, t = function(txt){return document.createTextNode(txt)},
                 modes = [Ani.Constants.IN, Ani.Constants.IN_OUT, Ani.Constants.OUT];
 
             function createGraph(easingType, mode){
-                var container = el("div");
                 const w = 213, h = 120, ph = 30;
-                var linear = new Ani.Easings.Linear(),
-                    title, easing, canvas, ctx;
+                var container = el("div"), linear = new Ani.Easings.Linear(),
+                    title, easing, canvas, ctx, mt;
+
+                container.className = "graph";
+
+                switch (mode){
+                    case Ani.Constants.IN:
+                        mt = "In"; break;
+                    case Ani.Constants.IN_OUT:
+                        mt = "In-Out"; break;
+                    case Ani.Constants.OUT:
+                        mt = "Out"; break;
+                    default:
+                        mt = "None"; break;
+                }
 
                 canvas = el("canvas");
                 ctx = canvas.getContext("2d");
                 easing = new Ani.Easings[easingType](mode);
                 graph = el("div");
                 title = el("h4");
-                title.appendChild(t(easingType+" easing, "+ mode));
+                title.appendChild(t(easingType+" easing, "+ mt));
 
                 canvas.width = w;
                 canvas.height = h;
@@ -60,55 +82,37 @@
                 return container;
             }
 
+            function addGraphs(c, type){
+                var l = el("div");
+                l.appendChild(createGraph(type, modes[0]));
+                l.appendChild(createGraph(type, modes[1]));
+                l.appendChild(createGraph(type, modes[2]));
+                c.appendChild(l);
+            }
+
             window.onload = function(){
-                var container = document.createElement("div");
-                document.body.appendChild(container);
+                var c = document.createElement("div"), l;
+                document.body.appendChild(c);
 
                 seq = new Ani.AniSequence();
 
                 seq.beginSequence();
                 seq.beginStep();
-                container.appendChild(createGraph("Linear", modes[0]));
 
-                container.appendChild(createGraph("Sine", modes[0]));
-                container.appendChild(createGraph("Sine", modes[1]));
-                container.appendChild(createGraph("Sine", modes[2]));
+                var l = el("div");
+                l.appendChild(createGraph("Linear", modes[0]));
+                c.appendChild(l);
 
-                container.appendChild(createGraph("Expo", modes[0]));
-                container.appendChild(createGraph("Expo", modes[1]));
-                container.appendChild(createGraph("Expo", modes[2]));
-
-                container.appendChild(createGraph("Cubic", modes[0]));
-                container.appendChild(createGraph("Cubic", modes[1]));
-                container.appendChild(createGraph("Cubic", modes[2]));
-
-                container.appendChild(createGraph("Quad", modes[0]));
-                container.appendChild(createGraph("Quad", modes[1]));
-                container.appendChild(createGraph("Quad", modes[2]));
-
-                container.appendChild(createGraph("Quart", modes[0]));
-                container.appendChild(createGraph("Quart", modes[1]));
-                container.appendChild(createGraph("Quart", modes[2]));
-
-                container.appendChild(createGraph("Quint", modes[0]));
-                container.appendChild(createGraph("Quint", modes[1]));
-                container.appendChild(createGraph("Quint", modes[2]));
-
-                container.appendChild(createGraph("Circ", modes[0]));
-                container.appendChild(createGraph("Circ", modes[1]));
-                container.appendChild(createGraph("Circ", modes[2]));
-
-                container.appendChild(createGraph("Back", modes[0]));
-                container.appendChild(createGraph("Back", modes[1]));
-                container.appendChild(createGraph("Back", modes[2]));
-
-                container.appendChild(createGraph("Bounce", modes[0]));
-                container.appendChild(createGraph("Bounce", modes[1]));
-                container.appendChild(createGraph("Bounce", modes[2]));
-
-                container.appendChild(createGraph("Elastic", modes[0]));
-                container.appendChild(createGraph("Elastic", modes[1]));
-                container.appendChild(createGraph("Elastic", modes[2]));
+                addGraphs(c, "Sine");
+                addGraphs(c, "Expo");
+                addGraphs(c, "Cubic");
+                addGraphs(c, "Quad");
+                addGraphs(c, "Quart");
+                addGraphs(c, "Quint");
+                addGraphs(c, "Circ");
+                addGraphs(c, "Back");
+                addGraphs(c, "Bounce");
+                addGraphs(c, "Elastic");
 
                 seq.endStep();
                 seq.endSequence();
