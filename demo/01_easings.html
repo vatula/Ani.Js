@@ -39,7 +39,6 @@
                 canvas = el("canvas");
                 ctx = canvas.getContext("2d");
                 easing = new Ani.Easings[easingType](mode);
-                graph = el("div");
                 title = el("h4");
                 title.appendChild(t(easingType+" easing, "+ mt));
 
@@ -65,8 +64,8 @@
                 var pos = {x: 5, y: h-ph},
                     _pos = {x: 5, y: h-ph};
 
-                seq.add(Ani.to({target: pos, targetFields: {x: w-5}, duration: 2, easing: linear}));
-                seq.add(Ani.to({target: pos, targetFields: {y: ph}, duration: 2, easing: easing, callback:{onUpdate: function(ani){
+                var ani1 = Ani.to({target: pos, targetFields: {x: w-5}, duration: 2, easing: linear})[0];
+                var ani2 = Ani.to({target: pos, targetFields: {y: ph}, duration: 2, easing: easing, callback:{onUpdate: function(ani){
                     ctx.beginPath();
                     ctx.moveTo(_pos.x, _pos.y);
                     ctx.lineTo(pos.x, pos.y);
@@ -75,7 +74,13 @@
 
                     _pos.x = pos.x;
                     _pos.y = pos.y;
-                }}}));
+                }}})[0];
+
+                //ani1.repeat();
+                //ani2.repeat();
+
+                seq.add(ani1);
+                seq.add(ani2);
 
                 container.appendChild(title);
                 container.appendChild(canvas);
@@ -99,7 +104,7 @@
                 seq.beginSequence();
                 seq.beginStep();
 
-                var l = el("div");
+                l = el("div");
                 l.appendChild(createGraph("Linear", modes[0]));
                 c.appendChild(l);
 

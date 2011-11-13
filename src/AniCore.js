@@ -272,8 +272,8 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
      /**
      * Repeat the animation.
 	 */
-     this.repeat = function(theRepeatCount){
-        if (theRepeatCount)
+    this.repeat = function(theRepeatCount){
+        if (theRepeatCount !== null && theRepeatCount !== undefined)
         {
             if (theRepeatCount > 1){
                 this.isRepeating = true;
@@ -286,7 +286,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
             this.isRepeating = true;
             this.repeatCount = -1;
         }
-     };
+    };
 
      /**
      * Stop any repeating.
