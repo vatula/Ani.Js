@@ -27,6 +27,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     this.callbackStartMethod = null; // on animation start
     this.callbackUpdateMethod = null; // on animation update
     this.callbackFinishMethod = null; // on animation finish
+    this.callbackRepeatMethod = null; // on animation repeat
 
     this.playMode = Ani.Constants.FORWARD;
     this.playDirection = Ani.Constants.FORWARD;
@@ -72,6 +73,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
             this.callbackStartMethod = callback.onStart || null;
             this.callbackUpdateMethod = callback.onUpdate || null;
             this.callbackFinishMethod = callback.onEnd || null;
+            this.callbackRepeatMethod = callback.onRepeat || null;
         }
     };
 
@@ -90,6 +92,12 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
     var dispatchOnEnd = function(){
         if (this.callbackFinishMethod){
             this.callbackFinishMethod.call(this, this);
+        }
+    };
+
+    var dispatchOnRepeat = function(){
+        if (this.callbackRepeatMethod){
+            this.callbackRepeatMethod.call(this,this);
         }
     };
 
@@ -145,6 +153,7 @@ Ani.AniCore = function(autostart, targetObject, durationEasing, durationDelay, t
                         if (this.playMode === Ani.Constants.YOYO) {
                             this.reverse();
                         }
+                        dispatchOnRepeat.call(this);
                         this.start();
                         this.repeatNumber++;
                     } else {

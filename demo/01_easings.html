@@ -4,6 +4,20 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <style type="text/css">
+            body > div > div {
+                float: left;
+                margin-right: 15px;
+            }
+
+            h2 {
+                font: normal normal bold 20px/28px, "Times New Roman", Times, serif;
+                background: #d0e0ff;
+                -webkit-border-radius: .3em .3em 0em 0em;
+                -moz-border-radius: .3em .3em 0em 0em;
+                border-radius: .3em .3em 0em 0em;
+                padding-left: 10px;
+                color: #333;
+            }
             .graph {
                 display: inline-block;
                 margin: 0 12px;
@@ -12,13 +26,69 @@
             .graph h4 {
                 font: normal normal normal 14px/18px Arial, Helvetica, sans-serif;
             }
+
+            .controls {
+                display: inline-block;
+            }
+
+            .controls button {
+                font: normal normal normal 14px/18px Arial, Helvetica, sans-serif;
+                background: #f0f0f0;
+                -webkit-border-radius: .5em .5em 1em 1em / .5em .5em 2em 2em;
+                -moz-border-radius: .5em .5em 1em 1em / .5em .5em 2em 2em;
+                border-radius: .5em .5em 1em 1em / .5em .5em 2em 2em;
+                border: none;
+            }
+
+            .controls button:hover {
+                cursor: pointer;
+            }
         </style>
         <script src="../build/Ani.js"></script>
+        <script type="text/javascript">
+            /**
+             * Provides requestAnimationFrame in a cross browser way.
+             * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+             */
+
+            if ( !window.requestAnimationFrame ) {
+
+            	window.requestAnimationFrame = ( function() {
+
+            		return window.webkitRequestAnimationFrame ||
+            		window.mozRequestAnimationFrame ||
+            		window.oRequestAnimationFrame ||
+            		window.msRequestAnimationFrame ||
+            		function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+
+            			window.setTimeout( callback, 1000 / 60 );
+
+            		};
+
+            	} )();
+
+            }
+        </script>
         <script type="text/javascript">
             var seq, el = function(e){return document.createElement(e)}, t = function(txt){return document.createTextNode(txt)},
                 modes = [Ani.Constants.IN, Ani.Constants.IN_OUT, Ani.Constants.OUT];
 
-            function createGraph(easingType, mode){
+            function initGraphCanvas(ctx, w, h, ph){
+                ctx.fillStyle = "#fbfbff";
+                ctx.fillRect(0,0, w, h);
+                ctx.lineWidth = 0.63;
+                ctx.strokeStyle = "#eeeefe";
+
+                ctx.beginPath();
+                ctx.moveTo(0,ph);
+                ctx.lineTo(w, ph);
+                ctx.moveTo(0, h-ph);
+                ctx.lineTo(w, h-ph);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            function createGraph(easingType, mode, play_pause, seek){
                 const w = 213, h = 120, ph = 30;
                 var container = el("div"), linear = new Ani.Easings.Linear(),
                     title, easing, canvas, ctx, mt;
@@ -40,24 +110,12 @@
                 ctx = canvas.getContext("2d");
                 easing = new Ani.Easings[easingType](mode);
                 title = el("h4");
-                title.appendChild(t(easingType+" easing, "+ mt));
+                title.appendChild(t("Easing "+ mt));
 
                 canvas.width = w;
                 canvas.height = h;
 
-                ctx.fillStyle = "#fbfbff";
-                ctx.fillRect(0,0, w, h);
-                ctx.lineWidth = 0.63;
-                ctx.strokeStyle = "#eeeefe";
-
-                ctx.beginPath();
-                ctx.moveTo(0,ph);
-                ctx.lineTo(w, ph);
-                ctx.moveTo(0, h-ph);
-                ctx.lineTo(w, h-ph);
-                ctx.closePath();
-                ctx.stroke();
-
+                initGraphCanvas(ctx, w, h, ph);
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = "#ff7f7f";
 
@@ -74,24 +132,60 @@
 
                     _pos.x = pos.x;
                     _pos.y = pos.y;
+                }, onRepeat: function(e){
+                    _pos.x = 5; _pos.y = h-ph;
+                    initGraphCanvas(ctx, w, h, ph);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "#ff7f7f";
                 }}})[0];
 
-                //ani1.repeat();
-                //ani2.repeat();
+                ani1.repeat();
+                ani2.repeat();
 
                 seq.add(ani1);
                 seq.add(ani2);
 
                 container.appendChild(title);
                 container.appendChild(canvas);
+
+                play_pause.addEventListener("click", function(e){
+                    if (ani1.isPlaying === true && ani1.isEnded === false){
+                        ani1.pause();
+                        ani2.pause();
+                        this.innerText = "→";
+                        //caption.nodeValue = "Play";
+                    } else if (ani1.isPlaying === false && ani1.isEnded === false){
+                        ani1.resume();
+                        ani2.resume();
+                        this.innerText = "↔";
+                        //caption.nodeValue = "Pause";
+                    }
+                });
+
                 return container;
             }
 
+            function addControls(c){
+                var wrapper = el("div"), play_pause = el("button"), seek = el("input");
+                wrapper.className = "controls";
+                play_pause.className = "btn-playPause";
+                play_pause.type = "button";
+                play_pause.innerText = "↔";
+                wrapper.appendChild(play_pause);
+                c.appendChild(wrapper);
+                return c;
+            }
+
             function addGraphs(c, type){
-                var l = el("div");
-                l.appendChild(createGraph(type, modes[0]));
-                l.appendChild(createGraph(type, modes[1]));
-                l.appendChild(createGraph(type, modes[2]));
+                var l = el("div"), hdr = el("h2");
+                hdr.appendChild(t(type));
+                l.appendChild(addControls(hdr));
+
+                var cs = hdr.children[0];
+
+                l.appendChild(createGraph(type, modes[0], cs.firstChild));
+                l.appendChild(createGraph(type, modes[1], cs.firstChild));
+                l.appendChild(createGraph(type, modes[2], cs.firstChild));
                 c.appendChild(l);
             }
 
@@ -103,10 +197,6 @@
 
                 seq.beginSequence();
                 seq.beginStep();
-
-                l = el("div");
-                l.appendChild(createGraph("Linear", modes[0]));
-                c.appendChild(l);
 
                 addGraphs(c, "Sine");
                 addGraphs(c, "Expo");
@@ -123,11 +213,11 @@
                 seq.endSequence();
                 seq.start();
 
-                window.setInterval(draw, 1000/120);
+                draw();
             };
 
             function draw(){
-                //requestAnimationFrame(draw);
+                requestAnimationFrame(draw, null);
                 Ani.update();
             }
         </script>
